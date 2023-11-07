@@ -1,20 +1,33 @@
-import { OrbitControls, Image, Gltf } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
-
-import { Euler, Vector3, MathUtils } from 'three'
 import { Scene } from './Scene'
-import { ScreenRaycaster } from './ScreenRaycaster'
-
-const offset = 0
-const scale = 500
-const size = 1 * scale
-
+import { CirclePointer } from './CirclePointer'
+import { useEffect, useState } from 'react'
+import { NavPoint } from './NavPoint'
 
 export function Viewer () {
+  const [loaded, setLoaded] = useState(false)
+
+  useEffect(() => {
+    async function loader () {
+      await NavPoint.loadTexture()
+      setLoaded(true)
+    }
+
+    void loader()
+  }, [])
+
   return (
-      <Canvas >
-        {/* <ScreenRaycaster /> */}
+    <>
+      {loaded &&
+      <Canvas
+        shadows={false}
+        gl={{ sortObjects: true }}
+        camera={{ far: 10000, fov: 80 }}
+      >
+        <CirclePointer />
         <Scene />
-      </Canvas>
+      </Canvas>}
+    </>
+
   )
 }

@@ -1,42 +1,26 @@
 module.exports = {
-    "env": {
-        "browser": true,
-        "es2021": true
+    root: true,
+    env: { browser: true, es2020: true },
+    extends: [
+      'plugin:@typescript-eslint/recommended',
+      'plugin:react-hooks/recommended',
+      'plugin:@typescript-eslint/recommended',
+      'plugin:prettier/recommended',
+    ],
+    ignorePatterns: ['dist', '.eslintrc.cjs'],
+    parser: '@typescript-eslint/parser',
+    plugins: ['react-refresh', '@typescript-eslint/eslint-plugin'],
+    rules: {
+      'react-refresh/only-export-components': [
+        'warn',
+        { allowConstantExport: true },
+      ],
+      'consistent-return': 'off',
+          'padding-line-between-statements': [
+              'error',
+              { blankLine: 'always', prev: '*', next: 'return' }
+          ],
+      // "react/jsx-indent" : ["error", 2],
     },
-    "extends": [
-        "standard-with-typescript",
-        "plugin:react/recommended"
-    ],
-    "overrides": [
-        {
-            "env": {
-                "node": true
-            },
-            "files": [
-                ".eslintrc.{js,cjs}"
-            ],
-            "parserOptions": {
-                "sourceType": "script"
-            }
-        }
-    ],
-    "parserOptions": {
-        "ecmaVersion": "latest",
-        "sourceType": "module"
-    },
-    "plugins": [
-        "react"
-    ],
-    "rules": {
-        'consistent-return': 'off',
-        'padding-line-between-statements': [
-            'error',
-            { blankLine: 'always', prev: '*', next: 'return' }
-        ],
-        '@typescript-eslint/no-non-null-assertion': 0,
-        '@typescript-eslint/explicit-function-return-type': 0,
-        'react/react-in-jsx-scope': 0,
-        'react/no-unknown-property': 0,
-        '@typescript-eslint/strict-boolean-expressions': 0,
-    }
-}
+  }
+  
