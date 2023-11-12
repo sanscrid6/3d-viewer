@@ -1,5 +1,5 @@
 import { Vector3, type Group, type Mesh, type Material, type Raycaster, type Camera, Vector2, type Object3D } from 'three'
-import { type NavPoint } from './NavPoint'
+import { type NavPoint } from './viewer/NavPoint'
 
 export function isMesh (mesh: any): mesh is Mesh {
   return mesh.isMesh

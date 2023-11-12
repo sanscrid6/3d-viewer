@@ -2,23 +2,29 @@ import { Canvas } from '@react-three/fiber'
 import { Scene } from './Scene'
 import { CirclePointer } from './CirclePointer'
 import { useEffect, useState } from 'react'
-import { NavPoint } from './NavPoint'
+import { NavPoint } from './viewer/NavPoint'
+import { $viewer } from './state/viewer'
+import { useStore } from 'effector-react'
 
 export function Viewer () {
   const [loaded, setLoaded] = useState(false)
+  const viewer = useStore($viewer)
 
   useEffect(() => {
     async function loader () {
       await NavPoint.loadTexture()
+
+      await viewer.init()
       setLoaded(true)
     }
 
     void loader()
   }, [])
+  
 
   return (
     <>
-      {loaded &&
+      {/* {loaded &&
       <Canvas
         shadows={false}
         gl={{ sortObjects: true }}
@@ -26,7 +32,7 @@ export function Viewer () {
       >
         <CirclePointer />
         <Scene />
-      </Canvas>}
+      </Canvas>} */}
     </>
 
   )

@@ -13,6 +13,8 @@
     "@react-three/drei": "^9.88.7",
     "@react-three/fiber": "^8.15.8",
     "@react-three/rapier": "^1.1.2",
+    "@tweenjs/tween.js": "^21.0.0",
+    "@types/": "tweenjs/tween.js",
     "@types/events": "^3.0.2",
     "@types/three": "^0.158.0",
     "effector": "^22.8.7",

@@ -5,7 +5,7 @@ import { type Mesh, MeshBasicMaterial, TextureLoader, Vector2, Vector3, Matrix3 
 import { $eventSystem } from './state/event-system/event-system.state'
 import { EventType } from './EventSystem'
 import { isNavPoint, raycastFromScreen } from './utils'
-import { NavPoint } from './NavPoint'
+import { NavPoint } from './viewer/NavPoint'
 
 export function CirclePointer () {
   const camera = useThree(state => state.camera)
@@ -60,7 +60,7 @@ export function CirclePointer () {
       opacity: 0.5,
       transparent: true,
       depthTest: false,
-      depthWrite: false
+      depthWrite: false,
     })
 
     return m
@@ -68,7 +68,7 @@ export function CirclePointer () {
 
   return (
     <>
-      <mesh {...pointerMesh} material={material} scale={20} ref={ref}>
+      <mesh {...pointerMesh} material={material} scale={20} ref={ref} renderOrder={1}>
         <planeGeometry args={[1, 1]}/>
       </mesh>
     </>
