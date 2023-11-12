@@ -19,7 +19,14 @@ export function isNavPoint (point: any): point is NavPoint {
 
 export const Vector3Zero = () => new Vector3(0, 0, 0)
 
-export function raycastFromScreen (raycaster: Raycaster, camera: Camera, screenPos: Vector2, objects: Object3D[]) {
+type RaycastFromScreenArgs = {
+  raycaster: Raycaster, 
+  camera: Camera,
+  screenPos: Vector2,
+  objects: Object3D[]
+}
+
+export function raycastFromScreen ({screenPos, camera, objects, raycaster} : RaycastFromScreenArgs) {
   const ray = new Vector2((screenPos.x / window.innerWidth) * 2 - 1, -(screenPos.y / window.innerHeight) * 2 + 1)
 
   raycaster.setFromCamera(ray, camera)

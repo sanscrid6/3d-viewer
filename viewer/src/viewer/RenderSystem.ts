@@ -19,7 +19,7 @@ export class RenderSystem extends BaseSystem {
 
     update(): void {
         this._renderer.renderLists.dispose()
-        this.renderer.render(this.viewer.scene, this.viewer.camera)
+        this.renderer.render(this.viewer.mainScene, this.viewer.camera)
     }
 
 }

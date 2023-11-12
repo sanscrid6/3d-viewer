@@ -7,13 +7,14 @@ export interface IFadable {
 }
 
 export class NavPoint extends Mesh implements IFadable {
-  static texture?: Texture
+  static texture: Texture
+  static readonly radius = 20
 
   public readonly isNavPoint = true
 
   constructor (position: Vector3) {
     const material = new MeshBasicMaterial({
-      map: NavPoint.texture!,
+      map: NavPoint.texture,
       transparent: true,
       depthWrite: false,
       depthTest: false,
@@ -26,9 +27,9 @@ export class NavPoint extends Mesh implements IFadable {
     super(new PlaneGeometry(1, 1), material)
 
     this.position.set(position.x, position.y, position.z)
-    this.scale.set(20, 20, 20)
+    this.scale.set(NavPoint.radius, NavPoint.radius, NavPoint.radius)
     this.rotation.set(MathUtils.degToRad(-90), 0, 0)
-    
+
     this.name = 'NavPoint'
     this.renderOrder = 1
   }

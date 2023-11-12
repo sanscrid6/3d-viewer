@@ -13,7 +13,7 @@ export function Viewer () {
   useEffect(() => {
     async function loader () {
       await NavPoint.loadTexture()
-
+      viewer.ready = true
       await viewer.init()
       setLoaded(true)
     }

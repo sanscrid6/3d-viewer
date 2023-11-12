@@ -105,23 +105,23 @@ type Side = {
     texture: Texture,
     position: Vector3,
     rotation: Euler,
+    scale: number
 }
 
-const size = 1
 
 export class ViewBox extends Object3D {
 
     private _currentTextures!: Texture[]
-    private _sides!: Mesh[]
+    private _sides: Mesh[] = []
 
     // front left right back up bottom
     private _pos = [
-        new Vector3(0, 0, - size / 2),
-        new Vector3(size / 2, 0, 0),
-        new Vector3(size / 2, 0, 0),
-        new Vector3(0, 0, size / 2),
-        new Vector3(0, size / 2, 0),
-        new Vector3(0, -size / 2, 0)
+        new Vector3(0, 0, -1/2),
+        new Vector3(-1/2, 0, 0),
+        new Vector3(1/2, 0, 0),
+        new Vector3(0, 0, 1/2),
+        new Vector3(0, 1/2, 0),
+        new Vector3(0, -1/2, 0)
     ]
 
     private _rot = [
@@ -135,8 +135,7 @@ export class ViewBox extends Object3D {
 
     constructor(){
         super()
-
-        
+        this.name = 'ViewBox'
     }
 
     async loadTextures(urls: string[]){
@@ -147,7 +146,7 @@ export class ViewBox extends Object3D {
         this._currentTextures = textures
     }
 
-    private buildSide({texture, position, rotation} : Side){
+    private buildSide({texture, position, rotation, scale} : Side){
         const geometry = new PlaneGeometry(1, 1)
         const material = sharedMaterial.clone()
         material.map = texture
@@ -155,6 +154,8 @@ export class ViewBox extends Object3D {
         const mesh = new Mesh(geometry, material)
         mesh.position.copy(position)
         mesh.rotation.copy(rotation)
+        mesh.scale.set(scale, scale, scale)
+        mesh.userData.ignoreRaycast = true
 
         return mesh
     }
@@ -169,9 +170,9 @@ export class ViewBox extends Object3D {
                     m.dispose()
                 })
             }
-        }
 
-        this.children = []
+            this.remove(side)
+        }
     }
 
     async buildCube(scale: number){
@@ -180,14 +181,13 @@ export class ViewBox extends Object3D {
         for(let i = 0; i < this._currentTextures.length; i++){
             const side = this.buildSide({
                 texture: this._currentTextures[i],
-                position: this._pos[i].clone(),
+                position: this.position.clone().add(this._pos[i].clone().multiplyScalar(scale)),
                 rotation: this._rot[i].clone(),
+                scale
             })
 
             this._sides.push(side)
         }
-
-        this.scale.set(scale, scale, scale)
 
         this.children = this._sides
     }
