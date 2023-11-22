@@ -40,6 +40,7 @@ export class NavPoint extends Mesh implements IFadable {
 
     this.name = 'NavPoint';
     this.renderOrder = 1;
+    this.userData.ignoreRaycast = true;
   }
 
   static async loadTexture() {

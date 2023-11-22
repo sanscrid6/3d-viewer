@@ -1,14 +1,11 @@
-import {
-  Raycaster,
-  Vector2,
-  Vector3,
-} from 'three';
+import { Raycaster, Vector2, Vector3 } from 'three';
 import { BaseSystem } from './BaseSystem';
 import { Viewer } from './Viewer';
 import { OrbitControls } from 'three/examples/jsm/Addons.js';
 import { $eventSystem } from '../state/event-system';
 import { EventSystem, EventType } from '../state/event-system/EventSystem';
-import { raycastFromScreen } from '../utils';
+import { lerpV3, raycastFromScreen } from '../utils';
+import { Tween } from 'three/examples/jsm/libs/tween.module.js';
 
 export class MoveSytem extends BaseSystem {
   private readonly _controls: OrbitControls;
@@ -61,7 +58,6 @@ export class MoveSytem extends BaseSystem {
 
     this._currentPoint = point.index;
 
-    this.viewer.locationScene.viewBox.position.copy(point.pos);
     await this.viewer.locationScene.viewBox.loadTextures([
       `LiveOak/cube/${this._currentPoint + 1}_cubefront.jpg`,
       `LiveOak/cube/${this._currentPoint + 1}_cubeleft.jpg`,
@@ -70,6 +66,31 @@ export class MoveSytem extends BaseSystem {
       `LiveOak/cube/${this._currentPoint + 1}_cubeup.jpg`,
       `LiveOak/cube/${this._currentPoint + 1}_cubedown.jpg`,
     ]);
+
+    const duration = 1000;
+
+    const startCamera = this.viewer.camera.position.clone();
+    const startBox = this.viewer.locationScene.viewBox.position.clone();
+    this.viewer.locationScene.hideNavPoints();
+    await new Promise((rs) => {
+      new Tween({ lerp: 0 })
+        .to({ lerp: 1 }, duration)
+        .onUpdate(({ lerp }) => {
+          const vCamera = lerpV3(startCamera, point.pos, lerp);
+          const vBox = lerpV3(startBox, point.pos, lerp);
+
+          // this.viewer.locationScene.viewBox.position.set(x, y, z)
+          this.viewer.camera.position.copy(vCamera);
+          this.viewer.locationScene.viewBox.position.copy(vBox);
+        })
+        .onComplete(() => {
+          rs(null);
+        })
+        .start();
+    });
+    this.viewer.locationScene.showNavPoint();
+    this.viewer.locationScene.viewBox.position.copy(point.pos);
+
     await this.viewer.locationScene.viewBox.buildCube(this.viewer.scale);
 
     this.viewer.camera.position.copy(point.pos);

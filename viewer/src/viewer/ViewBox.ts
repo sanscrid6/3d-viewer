@@ -8,6 +8,8 @@ import {
   Mesh,
   PlaneGeometry,
   MathUtils,
+  CubeTexture,
+  SRGBColorSpace,
 } from 'three';
 import { isMaterial } from '../utils';
 
@@ -104,6 +106,8 @@ import { isMaterial } from '../utils';
 const sharedMaterial = new MeshBasicMaterial({
   transparent: true,
   opacity: 1,
+  depthTest: false,
+  depthWrite: false,
 });
 
 type Side = {
@@ -147,12 +151,17 @@ export class ViewBox extends Object3D {
     const textures = await Promise.all(urls.map((u) => loader.loadAsync(u)));
 
     this._currentTextures = textures;
+    textures.forEach((t) => {
+      t.colorSpace = SRGBColorSpace;
+    });
   }
 
   private buildSide({ texture, position, rotation, scale }: Side) {
     const geometry = new PlaneGeometry(1, 1);
     const material = sharedMaterial.clone();
     material.map = texture;
+    material.needsUpdate = true;
+    material.reflectivity = 0;
 
     const mesh = new Mesh(geometry, material);
     mesh.position.copy(position);
@@ -184,16 +193,15 @@ export class ViewBox extends Object3D {
     for (let i = 0; i < this._currentTextures.length; i++) {
       const side = this.buildSide({
         texture: this._currentTextures[i],
-        position: this.position
-          .clone()
-          .add(this._pos[i].clone().multiplyScalar(scale)),
+        position: this._pos[i].clone().multiplyScalar(scale),
         rotation: this._rot[i].clone(),
         scale,
       });
 
       this._sides.push(side);
+      this.add(side);
     }
 
-    this.children = this._sides;
+    // this.children = this._sides;
   }
 }

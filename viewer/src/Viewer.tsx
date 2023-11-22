@@ -18,9 +18,5 @@ export function Viewer() {
     void loader();
   }, []);
 
-  return (
-    <>
-      
-    </>
-  );
+  return <></>;
 }

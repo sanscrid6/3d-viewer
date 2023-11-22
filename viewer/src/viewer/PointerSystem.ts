@@ -25,6 +25,8 @@ export class PointerSystem extends BaseSystem {
   }
 
   pointerMoveHandler(e: MouseEvent) {
+    if (!this.viewer.ready) return;
+
     if (!this._pointer) {
       this._pointer = new NavPoint(new Vector3());
       this.viewer.mainScene.add(this._pointer);
@@ -58,5 +60,15 @@ export class PointerSystem extends BaseSystem {
         p.fadeOut();
       }
     });
+  }
+
+  hidePointer() {
+    if (!this._pointer) return;
+    this._pointer!.visible = false;
+  }
+
+  showPointer() {
+    if (!this._pointer) return;
+    this._pointer!.visible = true;
   }
 }

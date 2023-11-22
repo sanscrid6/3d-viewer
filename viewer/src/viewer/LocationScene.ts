@@ -1,6 +1,6 @@
 import { Group, Object3D, Raycaster, Vector3 } from 'three';
 import { GLTF, GLTFLoader } from 'three/examples/jsm/Addons.js';
-import { isMesh } from '../utils';
+import { isMesh, isMeshStandardMaterial } from '../utils';
 import { NavPoint } from './NavPoint';
 import { ViewBox } from './ViewBox';
 
@@ -42,46 +42,42 @@ export class LocationScene extends Object3D {
   }
 
   async buildScene() {
-    this.children.push(this._location.scene);
-    this._root = this.children[0] as Group;
+    this._root = this._location.scene as Group;
 
-    const meshes = this.children[0].children.filter(isMesh);
+    const meshes = this._root.children.filter(isMesh);
     const spheres = meshes.filter((m) => m.name.startsWith('Sphere'));
     const triggers = meshes.filter((m) => m.name.startsWith('Trigger'));
 
+    const realMeshes = meshes.filter((m) => m.name.startsWith('mesh'));
+    realMeshes.forEach((m) => {
+      m.updateMatrixWorld();
+    });
+
     meshes.forEach((m) => {
-      m.visible = false;
+      // m.visible = false;
+      if (isMeshStandardMaterial(m.material)) {
+        // m.material.wireframe = true;
+        // m.material.vertexColors = true;
+      }
     });
 
     const pointPositions = [];
-    const pointMeshes = [];
-    const raycaster = new Raycaster();
+
+    this._root.remove(...spheres);
+    this._root.remove(...triggers);
 
     for (let i = 0; i < spheres.length; i++) {
       const s = spheres[i];
-
-      raycaster.set(s.position, new Vector3(0, -1, 0));
-      const intersect = raycaster.intersectObjects(this.children);
       const index = +s.name.slice(6);
-
       pointPositions.push({ position: s.position.clone(), index });
-
-      const pointMesh = new NavPoint(intersect[0].point);
-      pointMeshes.push(pointMesh);
-      this.add(pointMesh);
     }
 
     pointPositions.sort((a, b) => a.index - b.index);
 
     this._points = pointPositions.map((p) => p.position);
-    this._root.remove(...spheres);
-    this._root.remove(...triggers);
-
-    this._navPoints = pointMeshes;
 
     this._box = new ViewBox();
     const index = 0;
-    this._box.position.copy(this._points[0]);
     await this._box.loadTextures([
       `LiveOak/cube/${index + 1}_cubefront.jpg`,
       `LiveOak/cube/${index + 1}_cubeleft.jpg`,
@@ -91,6 +87,44 @@ export class LocationScene extends Object3D {
       `LiveOak/cube/${index + 1}_cubedown.jpg`,
     ]);
     await this._box.buildCube(this._scale);
-    this.children.push(this._box);
+    realMeshes.forEach((m) => {
+      this.add(m);
+    });
+    this.add(this._box);
+
+    this._box.position.copy(this._points[0]); // back front up down right left
+  }
+
+  createNavPoints() {
+    const pointMeshes = [];
+    const raycaster = new Raycaster();
+
+    for (let i = 0; i < this.points.length; i++) {
+      const s = this.points[i];
+      raycaster.set(s.clone(), new Vector3(0, -1, 0));
+      const intersect = raycaster
+        .intersectObjects(this.children.filter(isMesh), true)
+        .filter((r) => !r.object.userData.ignoreRaycast);
+
+      if (intersect.length === 0) continue;
+
+      const pointMesh = new NavPoint(intersect[0].point);
+      pointMeshes.push(pointMesh);
+      this.add(pointMesh);
+    }
+
+    this._navPoints = pointMeshes;
+  }
+
+  showNavPoint() {
+    this.navPoints.forEach((p) => {
+      p.visible = true;
+    });
+  }
+
+  hideNavPoints() {
+    this.navPoints.forEach((p) => {
+      p.visible = false;
+    });
   }
 }

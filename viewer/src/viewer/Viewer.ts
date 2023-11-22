@@ -11,6 +11,7 @@ import { LocationScene } from './LocationScene';
 import TWEEN from 'three/examples/jsm/libs/tween.module.js';
 import { BaseSystem } from './BaseSystem';
 import { PointerSystem } from './PointerSystem';
+import { sleep } from '../utils';
 
 const path = '/LiveOak/location.gltf';
 
@@ -62,9 +63,6 @@ export class Viewer {
     light.intensity = 1;
     this._mainScene.add(light);
 
-    const axesHelper = new AxesHelper(10000);
-    this._mainScene.add(axesHelper);
-
     this.systems = [
       new RenderSystem(this),
       new MoveSytem(this),
@@ -75,9 +73,9 @@ export class Viewer {
   async init() {
     const scene = new LocationScene(this._scale);
     this._locationScene = scene;
-
     await scene.loadGltf(path);
     await scene.buildScene();
+    scene.createNavPoints();
 
     this._mainScene.children.push(scene);
     const pos = scene.points[0];
