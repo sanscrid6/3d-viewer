@@ -1,93 +1,100 @@
-import { AmbientLight, AxesHelper, Euler, MathUtils, Mesh, MeshBasicMaterial, Object3D, PerspectiveCamera, PlaneGeometry, Scene, TextureLoader, Vector3 } from "three";
-import { RenderSystem } from "./RenderSystem";
-import { MoveSytem } from "./MoveSystem";
-import { LocationScene } from "./LocationScene";
-import TWEEN from 'three/examples/jsm/libs/tween.module.js'
-import { BaseSystem } from "./BaseSystem";
-import { ViewBox } from "./ViewBox";
-import { PointerSystem } from "./PointerSystem";
+import {
+  AmbientLight,
+  AxesHelper,
+  Object3D,
+  PerspectiveCamera,
+  Scene,
+} from 'three';
+import { RenderSystem } from './RenderSystem';
+import { MoveSytem } from './MoveSystem';
+import { LocationScene } from './LocationScene';
+import TWEEN from 'three/examples/jsm/libs/tween.module.js';
+import { BaseSystem } from './BaseSystem';
+import { PointerSystem } from './PointerSystem';
 
-const path = '/LiveOak/location.gltf'
+const path = '/LiveOak/location.gltf';
 
 export class Viewer {
-    private readonly _canvas: HTMLCanvasElement
-    private readonly _mainScene: Scene
-    private readonly _camera: PerspectiveCamera
+  private readonly _canvas: HTMLCanvasElement;
+  private readonly _mainScene: Scene;
+  private readonly _camera: PerspectiveCamera;
 
-    private _scale = 100
+  private _scale = 100;
 
-    private readonly systems: BaseSystem[]
-    private _locationScene!: LocationScene;
+  private readonly systems: BaseSystem[];
+  private _locationScene!: LocationScene;
 
-    public ready = false
+  public ready = false;
 
-    get scale(){
-        return this._scale
-    }
+  get scale() {
+    return this._scale;
+  }
 
-    get canvas(){
-        return this._canvas
-    }
+  get canvas() {
+    return this._canvas;
+  }
 
-    get mainScene(){
-        return this._mainScene
-    }
+  get mainScene() {
+    return this._mainScene;
+  }
 
-    get locationScene(){
-        return this._locationScene
-    }
-    
-    get camera(){
-        return this._camera
-    }
+  get locationScene() {
+    return this._locationScene;
+  }
 
-    constructor(){
-        this._canvas = document.getElementById('player')! as HTMLCanvasElement
+  get camera() {
+    return this._camera;
+  }
 
-        this._camera = new PerspectiveCamera( 100, window.innerWidth / window.innerHeight, 1, 10000 );
+  constructor() {
+    this._canvas = document.getElementById('player')! as HTMLCanvasElement;
 
-        this._mainScene = new Scene();
+    this._camera = new PerspectiveCamera(
+      100,
+      window.innerWidth / window.innerHeight,
+      1,
+      10000,
+    );
 
-        const light = new AmbientLight( 0xffffff ); // soft white light
-        light.intensity = 1
-        this._mainScene.add( light );
+    this._mainScene = new Scene();
 
-        const axesHelper = new AxesHelper( 10000 );
-        this._mainScene.add( axesHelper );
+    const light = new AmbientLight(0xffffff); // soft white light
+    light.intensity = 1;
+    this._mainScene.add(light);
 
-        this.systems = [
-            new RenderSystem(this),
-            new MoveSytem(this),
-            new PointerSystem(this),
-        ]
-    }
+    const axesHelper = new AxesHelper(10000);
+    this._mainScene.add(axesHelper);
 
-    async init(){
-        const scene = new LocationScene(this._scale)
-        this._locationScene = scene;
+    this.systems = [
+      new RenderSystem(this),
+      new MoveSytem(this),
+      new PointerSystem(this),
+    ];
+  }
 
-        await scene.loadGltf(path)
-        await scene.buildScene()
+  async init() {
+    const scene = new LocationScene(this._scale);
+    this._locationScene = scene;
 
-        this._mainScene.children.push(scene)
-        const pos = scene.points[0]
+    await scene.loadGltf(path);
+    await scene.buildScene();
 
-        const move = this.systems.find(s => s instanceof MoveSytem)! as MoveSytem
+    this._mainScene.children.push(scene);
+    const pos = scene.points[0];
 
-        move.setCameraPos(pos)
-        
-    }
+    const move = this.systems.find((s) => s instanceof MoveSytem)! as MoveSytem;
 
+    move.setCameraPos(pos);
+  }
 
-    remove(o: Object3D){
-        this._mainScene.remove(o)
-    }
+  remove(o: Object3D) {
+    this._mainScene.remove(o);
+  }
 
+  update(elapsed: number) {
+    this.systems.forEach((s) => s.update());
+    TWEEN.update(elapsed);
 
-    update(elapsed: number){
-        this.systems.forEach(s => s.update())
-        TWEEN.update(elapsed)
-
-        requestAnimationFrame(this.update.bind(this))
-    }
+    requestAnimationFrame(this.update.bind(this));
+  }
 }

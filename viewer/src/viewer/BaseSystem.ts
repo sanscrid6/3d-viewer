@@ -1,16 +1,11 @@
-import { Viewer } from "./Viewer";
+import { Viewer } from './Viewer';
 
 export abstract class BaseSystem {
+  protected readonly viewer: Viewer;
 
-    protected readonly viewer: Viewer;
+  constructor(viewer: Viewer) {
+    this.viewer = viewer;
+  }
 
-
-    constructor(viewer: Viewer){
-        this.viewer = viewer;
-    }
-
-
-    update(){
-        
-    }
+  update() {}
 }

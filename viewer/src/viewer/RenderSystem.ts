@@ -1,25 +1,23 @@
-import { WebGLRenderer } from "three";
-import { BaseSystem } from "./BaseSystem";
-import { Viewer } from "./Viewer";
+import { WebGLRenderer } from 'three';
+import { BaseSystem } from './BaseSystem';
+import { Viewer } from './Viewer';
 
 export class RenderSystem extends BaseSystem {
+  private readonly _renderer: WebGLRenderer;
 
-    private readonly _renderer: WebGLRenderer
+  get renderer() {
+    return this._renderer;
+  }
 
-    get renderer(){
-        return this._renderer
-    }
-    
-    constructor(viewer: Viewer){
-        super(viewer)
+  constructor(viewer: Viewer) {
+    super(viewer);
 
-        this._renderer = new WebGLRenderer({canvas: viewer.canvas})
-        this._renderer.setSize( window.innerWidth, window.innerHeight );        
-    }
+    this._renderer = new WebGLRenderer({ canvas: viewer.canvas });
+    this._renderer.setSize(window.innerWidth, window.innerHeight);
+  }
 
-    update(): void {
-        this._renderer.renderLists.dispose()
-        this.renderer.render(this.viewer.mainScene, this.viewer.camera)
-    }
-
+  update(): void {
+    this._renderer.renderLists.dispose();
+    this.renderer.render(this.viewer.mainScene, this.viewer.camera);
+  }
 }

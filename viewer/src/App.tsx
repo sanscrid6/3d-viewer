@@ -1,12 +1,12 @@
-import './App.css'
-import { Viewer } from './Viewer'
+import './App.css';
+import { Viewer } from './Viewer';
 
-function App () {
+function App() {
   return (
     <>
       <Viewer />
     </>
-  )
+  );
 }
 
-export default App
+export default App;

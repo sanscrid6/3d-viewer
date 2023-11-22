@@ -4,7 +4,6 @@ module.exports = {
     extends: [
       'plugin:@typescript-eslint/recommended',
       'plugin:react-hooks/recommended',
-      // 'plugin:@typescript-eslint/recommended',
       'plugin:prettier/recommended',
     ],
     ignorePatterns: ['dist', '.eslintrc.cjs', 'backend'],
@@ -20,7 +19,6 @@ module.exports = {
               'error',
               { blankLine: 'always', prev: '*', next: 'return' }
           ],
-      // "react/jsx-indent" : ["error", 2],
     },
   }
   
