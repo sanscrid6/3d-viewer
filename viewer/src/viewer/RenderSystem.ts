@@ -1,5 +1,5 @@
 import { SRGBColorSpace, WebGLRenderer } from 'three';
-import { BaseSystem } from './BaseSystem';
+import { BaseSystem, SystemName } from './BaseSystem';
 import { Viewer } from './Viewer';
 
 export class RenderSystem extends BaseSystem {
@@ -11,6 +11,7 @@ export class RenderSystem extends BaseSystem {
 
   constructor(viewer: Viewer) {
     super(viewer);
+    this.name = SystemName.Render;
 
     this._renderer = new WebGLRenderer({ canvas: viewer.canvas });
     this._renderer.setSize(window.innerWidth, window.innerHeight);

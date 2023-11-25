@@ -1,17 +1,10 @@
-import {
-  AmbientLight,
-  AxesHelper,
-  Object3D,
-  PerspectiveCamera,
-  Scene,
-} from 'three';
+import { AmbientLight, Object3D, PerspectiveCamera, Scene } from 'three';
 import { RenderSystem } from './RenderSystem';
 import { MoveSytem } from './MoveSystem';
 import { LocationScene } from './LocationScene';
 import TWEEN from 'three/examples/jsm/libs/tween.module.js';
-import { BaseSystem } from './BaseSystem';
+import { BaseSystem, SystemName } from './BaseSystem';
 import { PointerSystem } from './PointerSystem';
-import { sleep } from '../utils';
 
 const path = '/LiveOak/location.gltf';
 
@@ -68,6 +61,8 @@ export class Viewer {
       new MoveSytem(this),
       new PointerSystem(this),
     ];
+
+    this.systems.forEach((s) => s.init());
   }
 
   async init() {
@@ -79,10 +74,15 @@ export class Viewer {
 
     this._mainScene.children.push(scene);
     const pos = scene.points[0];
+    scene.showNavPoints(pos);
 
     const move = this.systems.find((s) => s instanceof MoveSytem)! as MoveSytem;
 
     move.setCameraPos(pos);
+  }
+
+  getSystem<T extends BaseSystem>(name: SystemName) {
+    return this.systems.find((s) => s.name === name) as T;
   }
 
   remove(o: Object3D) {

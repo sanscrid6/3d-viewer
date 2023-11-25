@@ -12,10 +12,7 @@ export class LocationScene extends Object3D {
   private _navPoints: NavPoint[] = [];
   private _scale: number;
   private _box!: ViewBox;
-
-  // getPointPosition(index: number){
-  //     return this._points[index]
-  // }
+  private _raycaster!: Raycaster;
 
   get points() {
     return this._points.map((p) => p.clone());
@@ -33,6 +30,7 @@ export class LocationScene extends Object3D {
     super();
 
     this._scale = scale;
+    this._raycaster = new Raycaster();
   }
 
   async loadGltf(url: string) {
@@ -97,18 +95,18 @@ export class LocationScene extends Object3D {
 
   createNavPoints() {
     const pointMeshes = [];
-    const raycaster = new Raycaster();
 
     for (let i = 0; i < this.points.length; i++) {
       const s = this.points[i];
-      raycaster.set(s.clone(), new Vector3(0, -1, 0));
-      const intersect = raycaster
+      this._raycaster.set(s.clone(), new Vector3(0, -1, 0));
+      const intersect = this._raycaster
         .intersectObjects(this.children.filter(isMesh), true)
         .filter((r) => !r.object.userData.ignoreRaycast);
 
       if (intersect.length === 0) continue;
 
       const pointMesh = new NavPoint(intersect[0].point);
+      pointMesh.visible = false;
       pointMeshes.push(pointMesh);
       this.add(pointMesh);
     }
@@ -116,10 +114,28 @@ export class LocationScene extends Object3D {
     this._navPoints = pointMeshes;
   }
 
-  showNavPoint() {
-    this.navPoints.forEach((p) => {
-      p.visible = true;
-    });
+  showNavPoints(currPoint: Vector3) {
+    // this.navPoints.forEach((p) => {
+    //   p.visible = true;
+    // });
+
+    for (const point of this.navPoints) {
+      this._raycaster.set(
+        point.position,
+        currPoint.clone().sub(point.position),
+      );
+
+      const objects = this._raycaster
+        .intersectObjects(this.children, true)
+        .filter((o) => !o.object.userData.ignoreRaycast);
+
+      if (
+        objects.length === 0 ||
+        objects[0].distance > point.position.distanceTo(currPoint)
+      ) {
+        point.visible = true;
+      }
+    }
   }
 
   hideNavPoints() {

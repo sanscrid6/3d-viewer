@@ -9,6 +9,7 @@ import {
   type Object3D,
   MathUtils,
   MeshStandardMaterial,
+  MeshBasicMaterial,
 } from 'three';
 import { type NavPoint } from './viewer/NavPoint';
 
@@ -32,7 +33,9 @@ export function isMeshStandardMaterial(m: any): m is MeshStandardMaterial {
   return m.type === 'MeshStandardMaterial';
 }
 
-export const Vector3Zero = () => new Vector3(0, 0, 0);
+export function isMeshBasicMaterial(m: any): m is MeshBasicMaterial {
+  return m.type === 'MeshBasicMaterial';
+}
 
 type RaycastFromScreenArgs = {
   raycaster: Raycaster;

@@ -1,11 +1,13 @@
 import { Raycaster, Vector2, Vector3 } from 'three';
-import { BaseSystem } from './BaseSystem';
+import { BaseSystem, SystemName } from './BaseSystem';
 import { Viewer } from './Viewer';
 import { OrbitControls } from 'three/examples/jsm/Addons.js';
 import { $eventSystem } from '../state/event-system';
 import { EventSystem, EventType } from '../state/event-system/EventSystem';
 import { lerpV3, raycastFromScreen } from '../utils';
 import { Tween } from 'three/examples/jsm/libs/tween.module.js';
+import { moveToFx } from '../state/viewer';
+import { PointerSystem } from './PointerSystem';
 
 export class MoveSytem extends BaseSystem {
   private readonly _controls: OrbitControls;
@@ -14,26 +16,30 @@ export class MoveSytem extends BaseSystem {
 
   private _currentPoint = 0;
   private _inMovement = false;
+  private _pointer!: PointerSystem;
 
   constructor(viewer: Viewer) {
     super(viewer);
 
+    this.name = SystemName.Move;
     this._controls = new OrbitControls(viewer.camera, viewer.canvas);
     this._eventSystem = $eventSystem.getState();
     this._raycaster = new Raycaster();
 
     this._eventSystem.addListener(
       EventType.GlobalPonterClick,
-      this.moveTo.bind(this),
+      this.mouseListener.bind(this),
     );
   }
 
-  async moveTo(e: MouseEvent) {
+  init(): void {
+    this._pointer = this.viewer.getSystem<PointerSystem>(SystemName.Pointer);
+  }
+
+  mouseListener(e: MouseEvent) {
     if (this._inMovement) {
       return;
     }
-
-    this._inMovement = true;
 
     const objects = raycastFromScreen({
       raycaster: this._raycaster,
@@ -45,18 +51,46 @@ export class MoveSytem extends BaseSystem {
     const position = objects[0].point.clone();
     const points = this.viewer.locationScene.points;
 
-    const point = points.reduce(
-      (acc, curr, index) => {
-        if (acc.pos.distanceTo(position) > curr.distanceTo(position)) {
-          return { pos: curr, index };
-        }
+    const point = points
+      .map((point, index) => ({ point, index }))
+      .filter(({ point }) => {
+        this._raycaster.set(
+          this.viewer.camera.position,
+          point.clone().sub(this.viewer.camera.position).normalize(),
+        );
 
-        return acc;
-      },
-      { pos: new Vector3(Infinity, Infinity, Infinity), index: 0 },
-    );
+        const objects = this._raycaster
+          .intersectObjects(this.viewer.locationScene.children, true)
+          .filter((o) => !o.object.userData.ignoreRaycast);
+
+        if (
+          objects.length === 0 ||
+          objects[0].distance > point.distanceTo(this.viewer.camera.position)
+        )
+          return true;
+
+        return false;
+      })
+      .reduce(
+        (acc, { point, index }) => {
+          if (acc.pos.distanceTo(position) > point.distanceTo(position)) {
+            return { pos: point, index };
+          }
+
+          return acc;
+        },
+        { pos: new Vector3(Infinity, Infinity, Infinity), index: 0 },
+      );
 
     this._currentPoint = point.index;
+
+    void moveToFx(point.index);
+  }
+
+  async moveTo(pointIdx: number) {
+    this._inMovement = true;
+
+    const point = this.viewer.locationScene.points[pointIdx];
 
     await this.viewer.locationScene.viewBox.loadTextures([
       `LiveOak/cube/${this._currentPoint + 1}_cubefront.jpg`,
@@ -72,12 +106,13 @@ export class MoveSytem extends BaseSystem {
     const startCamera = this.viewer.camera.position.clone();
     const startBox = this.viewer.locationScene.viewBox.position.clone();
     this.viewer.locationScene.hideNavPoints();
+    this._pointer.hidePointer();
     await new Promise((rs) => {
       new Tween({ lerp: 0 })
         .to({ lerp: 1 }, duration)
         .onUpdate(({ lerp }) => {
-          const vCamera = lerpV3(startCamera, point.pos, lerp);
-          const vBox = lerpV3(startBox, point.pos, lerp);
+          const vCamera = lerpV3(startCamera, point, lerp);
+          const vBox = lerpV3(startBox, point, lerp);
 
           // this.viewer.locationScene.viewBox.position.set(x, y, z)
           this.viewer.camera.position.copy(vCamera);
@@ -88,18 +123,19 @@ export class MoveSytem extends BaseSystem {
         })
         .start();
     });
-    this.viewer.locationScene.showNavPoint();
-    this.viewer.locationScene.viewBox.position.copy(point.pos);
+    this.viewer.locationScene.viewBox.position.copy(point);
 
     await this.viewer.locationScene.viewBox.buildCube(this.viewer.scale);
+    this.viewer.locationScene.showNavPoints(point);
+    this._pointer.showPointer();
 
-    this.viewer.camera.position.copy(point.pos);
+    this.viewer.camera.position.copy(point);
 
     const lookAt = this.viewer.camera.rotation.clone();
     const forward = new Vector3(0, 0, 1);
     forward.applyEuler(lookAt);
     const target = forward.normalize();
-    this._controls.target = point.pos.clone().sub(target);
+    this._controls.target = point.clone().sub(target);
 
     this._controls.update();
 

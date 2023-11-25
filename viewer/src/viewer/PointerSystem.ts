@@ -1,7 +1,7 @@
 import { Matrix3, Raycaster, Vector2, Vector3 } from 'three';
 import { $eventSystem } from '../state/event-system';
 import { EventSystem, EventType } from '../state/event-system/EventSystem';
-import { BaseSystem } from './BaseSystem';
+import { BaseSystem, SystemName } from './BaseSystem';
 import { NavPoint } from './NavPoint';
 import { Viewer } from './Viewer';
 import { raycastFromScreen } from '../utils';
@@ -14,6 +14,7 @@ export class PointerSystem extends BaseSystem {
 
   constructor(viewer: Viewer) {
     super(viewer);
+    this.name = SystemName.Pointer;
     this._raycaster = new Raycaster();
 
     this._eventSystem = $eventSystem.getState();
@@ -38,6 +39,8 @@ export class PointerSystem extends BaseSystem {
       objects: this.viewer.locationScene.children,
       camera: this.viewer.camera,
     });
+
+    if (objects.length === 0) return;
 
     const position = objects[0].point.clone();
     const normalMatrix = new Matrix3();
@@ -64,11 +67,11 @@ export class PointerSystem extends BaseSystem {
 
   hidePointer() {
     if (!this._pointer) return;
-    this._pointer!.visible = false;
+    this._pointer.visible = false;
   }
 
   showPointer() {
     if (!this._pointer) return;
-    this._pointer!.visible = true;
+    this._pointer.visible = true;
   }
 }

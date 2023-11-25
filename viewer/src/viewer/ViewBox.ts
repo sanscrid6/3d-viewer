@@ -8,100 +8,9 @@ import {
   Mesh,
   PlaneGeometry,
   MathUtils,
-  CubeTexture,
   SRGBColorSpace,
 } from 'three';
-import { isMaterial } from '../utils';
-
-// interface BoxProps {
-//   sides: Side[]
-//   scale: number
-//   opacity: number
-//   position: Vector3
-// }
-
-// interface Side {
-//   position: Vector3
-//   texture: Texture
-//   rotation: Euler
-//   key: string
-// }
-
-// export function Box ({ sides, scale, opacity, position }: BoxProps) {
-//   const materials = sides.map(side => {
-//     return new MeshBasicMaterial({
-//       map: side.texture,
-//       transparent: true,
-//       opacity
-//     })
-//   })
-//   // map на 6 материалов ?
-//   console.log(position)
-
-//   return (
-//     <object3D name='container' position={position}>
-//       {sides.map((side, index) => {
-//         return (
-//           <mesh
-//             key={side.key}
-//             material={materials[index]}
-//             position={side.position}
-//             rotation={side.rotation}
-//             scale={scale}
-//             userData={{ ignoreRaycast: true }}
-//           >
-//             <planeGeometry args={[1, 1]}/>
-//           </mesh>
-//         )
-//       })}
-
-//       {/* <PerspectiveCamera makeDefault/> */}
-
-//       {/* <Image
-//         position={new Vector3(currPoint.position.x, currPoint.position.y, currPoint.position.z - size / 2)}
-//         texture={front}
-//         scale={scale}
-//         userData={{ ignoreRaycast: true }}
-//       />
-//       <Image
-//         position={new Vector3(currPoint.position.x - size / 2, currPoint.position.y, currPoint.position.z)}
-//         texture={left}
-//         rotation={new Euler(0, MathUtils.degToRad(90), 0)}
-//         scale={scale}
-//         userData={{ ignoreRaycast: true }}
-//       />
-//       <Image
-//         position={new Vector3(currPoint.position.x + size / 2, currPoint.position.y, currPoint.position.z)}
-//         texture={right}
-//         rotation={new Euler(0, MathUtils.degToRad(-90), 0)}
-//         scale={scale}
-//         userData={{ ignoreRaycast: true }}
-//       />
-//       <Image
-//         position={new Vector3(currPoint.position.x, currPoint.position.y, currPoint.position.z + size / 2)}
-//         texture={back}
-//         rotation={new Euler(0, MathUtils.degToRad(180), 0)}
-//         scale={scale}
-//         userData={{ ignoreRaycast: true }}
-//         />
-//       <Image
-//         position={new Vector3(currPoint.position.x, currPoint.position.y + size / 2, currPoint.position.z)}
-//         texture={top}
-//         rotation={new Euler(MathUtils.degToRad(90), 0, MathUtils.degToRad(90))}
-//         scale={scale}
-//         userData={{ ignoreRaycast: true }}
-//       />
-//       <Image
-//         position={new Vector3(currPoint.position.x, currPoint.position.y - size / 2, currPoint.position.z)}
-//         texture={bottom}
-//         rotation={new Euler(MathUtils.degToRad(-90), 0, MathUtils.degToRad(-90))}
-//         scale={scale}
-//         userData={{ ignoreRaycast: true }}
-//       /> */}
-
-//     </object3D>
-//   )
-// }
+import { isMeshBasicMaterial } from '../utils';
 
 const sharedMaterial = new MeshBasicMaterial({
   transparent: true,
@@ -175,12 +84,9 @@ export class ViewBox extends Object3D {
   dispose() {
     for (const side of this._sides) {
       side.geometry.dispose();
-      if (isMaterial(side.material)) {
+      if (isMeshBasicMaterial(side.material)) {
+        side.material.map?.dispose();
         side.material.dispose();
-      } else {
-        side.material.forEach((m) => {
-          m.dispose();
-        });
       }
 
       this.remove(side);
@@ -201,7 +107,5 @@ export class ViewBox extends Object3D {
       this._sides.push(side);
       this.add(side);
     }
-
-    // this.children = this._sides;
   }
 }
