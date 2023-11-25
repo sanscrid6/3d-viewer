@@ -17,7 +17,6 @@ export class RenderSystem extends BaseSystem {
     this._renderer.setSize(window.innerWidth, window.innerHeight);
 
     this._renderer.outputColorSpace = SRGBColorSpace;
-    // this._renderer. = true;
   }
 
   update(): void {

@@ -82,6 +82,7 @@ export class MoveSytem extends BaseSystem {
         { pos: new Vector3(Infinity, Infinity, Infinity), index: 0 },
       );
 
+    if (point.index === this._currentPoint) return;
     this._currentPoint = point.index;
 
     void moveToFx(point.index);
@@ -89,6 +90,7 @@ export class MoveSytem extends BaseSystem {
 
   async moveTo(pointIdx: number) {
     this._inMovement = true;
+    this._controls.enabled = false;
 
     const point = this.viewer.locationScene.points[pointIdx];
 
@@ -100,6 +102,8 @@ export class MoveSytem extends BaseSystem {
       `LiveOak/cube/${this._currentPoint + 1}_cubeup.jpg`,
       `LiveOak/cube/${this._currentPoint + 1}_cubedown.jpg`,
     ]);
+
+    await this.viewer.locationScene.viewBox.buildNewCube(this.viewer.scale);
 
     const duration = 1000;
 
@@ -113,8 +117,8 @@ export class MoveSytem extends BaseSystem {
         .onUpdate(({ lerp }) => {
           const vCamera = lerpV3(startCamera, point, lerp);
           const vBox = lerpV3(startBox, point, lerp);
+          this.viewer.locationScene.viewBox.alpha = lerp;
 
-          // this.viewer.locationScene.viewBox.position.set(x, y, z)
           this.viewer.camera.position.copy(vCamera);
           this.viewer.locationScene.viewBox.position.copy(vBox);
         })
@@ -140,6 +144,7 @@ export class MoveSytem extends BaseSystem {
     this._controls.update();
 
     this._inMovement = false;
+    this._controls.enabled = true;
   }
 
   setCameraPos(v: Vector3) {

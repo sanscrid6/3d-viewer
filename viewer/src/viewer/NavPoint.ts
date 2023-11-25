@@ -39,7 +39,7 @@ export class NavPoint extends Mesh implements IFadable {
     this.rotation.set(MathUtils.degToRad(-90), 0, 0);
 
     this.name = 'NavPoint';
-    this.renderOrder = 1;
+    this.renderOrder = 10;
     this.userData.ignoreRaycast = true;
   }
 
