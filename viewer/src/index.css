@@ -14,8 +14,18 @@
   -webkit-text-size-adjust: 100%;
 }
 
-body, html, #root {
-  /* height: 100%; */
+body, html, #root, #player {
+  height: 100%;
+}
+
+#player, #root {
+  position: absolute;
+}
+
+#root {
+  z-index: 1;
+  width: 100%;
+  pointer-events: none;
 }
 
 body {

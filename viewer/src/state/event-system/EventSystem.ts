@@ -15,6 +15,8 @@ export class EventSystem extends EventEmitter {
   private readonly distEpsilon = 20;
   private readonly timeEpsilon = 2000;
 
+  public enabled = false;
+
   constructor() {
     super();
     window.addEventListener(
@@ -29,10 +31,13 @@ export class EventSystem extends EventEmitter {
   }
 
   private globalPointerMoveHandler(e: MouseEvent) {
+    if (!this.enabled) return;
     this.emit(EventType.GlobalPointerMove, e);
   }
 
   private globalPointerDownHandler(e: MouseEvent) {
+    if (!this.enabled) return;
+
     this.pointerDownPos = {
       pos: new Vector2(e.clientX, e.clientY),
       time: Date.now(),
@@ -40,6 +45,8 @@ export class EventSystem extends EventEmitter {
   }
 
   private globalPointerUpHandler(e: MouseEvent) {
+    if (!this.enabled) return;
+
     if (
       this.pointerDownPos.pos.distanceTo(new Vector2(e.clientX, e.clientY)) <
         this.distEpsilon &&

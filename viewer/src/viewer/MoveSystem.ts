@@ -103,7 +103,7 @@ export class MoveSytem extends BaseSystem {
       `LiveOak/cube/${this._currentPoint + 1}_cubedown.jpg`,
     ]);
 
-    await this.viewer.locationScene.viewBox.buildNewCube(this.viewer.scale);
+    this.viewer.locationScene.viewBox.buildNewCube(this.viewer.scale);
 
     const duration = 1000;
 
@@ -129,7 +129,7 @@ export class MoveSytem extends BaseSystem {
     });
     this.viewer.locationScene.viewBox.position.copy(point);
 
-    await this.viewer.locationScene.viewBox.buildCube(this.viewer.scale);
+    this.viewer.locationScene.viewBox.buildCube(this.viewer.scale);
     this.viewer.locationScene.showNavPoints(point);
     this._pointer.showPointer();
 

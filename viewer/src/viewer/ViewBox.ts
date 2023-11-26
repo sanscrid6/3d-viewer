@@ -28,10 +28,10 @@ type Side = {
 
 export class ViewBox extends Object3D {
   private _newTextures: Texture[] = [];
-  private _sides: Mesh[] = [];
+  private _sides: Mesh<PlaneGeometry, MeshBasicMaterial>[] = [];
   private _oldTextures: Texture[] = [];
 
-  private _newSides: Mesh[] = [];
+  private _newSides: Mesh<PlaneGeometry, MeshBasicMaterial>[] = [];
 
   // front left right back up bottom
   private _pos = [
@@ -65,6 +65,17 @@ export class ViewBox extends Object3D {
     this.name = 'ViewBox';
   }
 
+  buildCube(scale: number) {
+    this.build(scale, this._sides, this._newTextures, 1);
+
+    this._oldTextures = this._newTextures;
+    this._newTextures = [];
+  }
+
+  buildNewCube(scale: number) {
+    this.build(scale, this._newSides, this._newTextures, 0);
+  }
+
   async loadTextures(urls: string[]) {
     const loader = new TextureLoader();
 
@@ -92,49 +103,36 @@ export class ViewBox extends Object3D {
     return mesh;
   }
 
-  dispose() {
-    for (const side of this._sides) {
+  private dispose(sides: Mesh<PlaneGeometry, MeshBasicMaterial>[]) {
+    for (const side of sides) {
       side.geometry.dispose();
-      if (isMeshBasicMaterial(side.material)) {
-        side.material.map?.dispose();
-        side.material.dispose();
-      }
+      side.material.map?.dispose();
+      side.material.dispose();
 
       this.remove(side);
     }
+
+    sides = [];
   }
 
-  async buildNewCube(scale: number) {
-    for (let i = 0; i < this._newTextures.length; i++) {
+  private build(
+    scale: number,
+    sides: Mesh<PlaneGeometry, MeshBasicMaterial>[],
+    textures: Texture[],
+    renderOrder: number,
+  ) {
+    this.dispose(sides);
+
+    for (let i = 0; i < textures.length; i++) {
       const side = this.buildSide({
-        texture: this._newTextures[i],
+        texture: textures[i],
         position: this._pos[i].clone().multiplyScalar(scale),
         rotation: this._rot[i].clone(),
         scale,
       });
-
-      side.renderOrder = 0;
-      this._newSides.push(side);
+      side.renderOrder = renderOrder;
+      sides.push(side);
       this.add(side);
     }
-  }
-
-  async buildCube(scale: number) {
-    this.dispose();
-
-    for (let i = 0; i < this._newTextures.length; i++) {
-      const side = this.buildSide({
-        texture: this._newTextures[i],
-        position: this._pos[i].clone().multiplyScalar(scale),
-        rotation: this._rot[i].clone(),
-        scale,
-      });
-      side.renderOrder = 1;
-      this._sides.push(side);
-      this.add(side);
-    }
-
-    this._oldTextures = this._newTextures;
-    this._newTextures = [];
   }
 }

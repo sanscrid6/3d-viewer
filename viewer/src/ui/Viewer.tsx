@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
-import { NavPoint } from './viewer/NavPoint';
-import { $viewer } from './state/viewer';
+import { NavPoint } from '../viewer/NavPoint';
+import { $viewer } from '../state/viewer';
 import { useStore } from 'effector-react';
+import Splash from './Splash';
 
 export function Viewer() {
   const [loaded, setLoaded] = useState(false);
+  const [start, setStart] = useState(false);
   const viewer = useStore($viewer);
 
   useEffect(() => {
@@ -18,5 +20,5 @@ export function Viewer() {
     void loader();
   }, []);
 
-  return <></>;
+  return <>{!(loaded && start) && <Splash setStart={setStart} />}</>;
 }
