@@ -5,8 +5,8 @@ import { LocationScene } from './LocationScene';
 import TWEEN from 'three/examples/jsm/libs/tween.module.js';
 import { BaseSystem, SystemName } from './BaseSystem';
 import { PointerSystem } from './PointerSystem';
-
-const path = '/LiveOak/location.gltf';
+import { asset } from '../api/utils';
+import { $params } from '../state/location';
 
 export class Viewer {
   private readonly _canvas: HTMLCanvasElement;
@@ -68,7 +68,9 @@ export class Viewer {
   async init() {
     const scene = new LocationScene(this._scale);
     this._locationScene = scene;
-    await scene.loadGltf(path);
+    const id = $params.getState().locationId;
+
+    await scene.loadGltf(asset(`/${id}/location.gltf`));
     await scene.buildScene();
     scene.createNavPoints();
 

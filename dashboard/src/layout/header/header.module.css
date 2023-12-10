@@ -1,0 +1,24 @@
+.container {
+    display: flex;
+    align-items: center;
+    background-color: rgb(238, 238, 238);
+    justify-content: space-between;
+    padding: 1rem 2rem;
+}
+
+.navigation {
+    display: flex;
+    flex-direction: row;
+    column-gap: 0.5rem;
+}
+
+.signContainer {
+    display: flex;
+    flex-direction: row;
+    column-gap: 0.5rem;
+}
+
+.link {
+    /* text-decoration: none; */
+    color: black;
+}

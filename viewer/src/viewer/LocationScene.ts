@@ -3,6 +3,8 @@ import { GLTF, GLTFLoader } from 'three/examples/jsm/Addons.js';
 import { isMesh, isMeshStandardMaterial } from '../utils';
 import { NavPoint } from './NavPoint';
 import { ViewBox } from './ViewBox';
+import { asset } from '../api/utils';
+import { $params } from '../state/location';
 
 export class LocationScene extends Object3D {
   private _location!: GLTF;
@@ -76,13 +78,15 @@ export class LocationScene extends Object3D {
 
     this._box = new ViewBox();
     const index = 0;
+    const id = $params.getState().locationId;
+
     await this._box.loadTextures([
-      `LiveOak/cube/${index + 1}_cubefront.jpg`,
-      `LiveOak/cube/${index + 1}_cubeleft.jpg`,
-      `LiveOak/cube/${index + 1}_cuberight.jpg`,
-      `LiveOak/cube/${index + 1}_cubeback.jpg`,
-      `LiveOak/cube/${index + 1}_cubeup.jpg`,
-      `LiveOak/cube/${index + 1}_cubedown.jpg`,
+      asset(`/${id}/cube/${index + 1}_cubefront.jpg`),
+      asset(`/${id}/cube/${index + 1}_cubeleft.jpg`),
+      asset(`/${id}/cube/${index + 1}_cuberight.jpg`),
+      asset(`/${id}/cube/${index + 1}_cubeback.jpg`),
+      asset(`/${id}/cube/${index + 1}_cubeup.jpg`),
+      asset(`/${id}/cube/${index + 1}_cubedown.jpg`),
     ]);
     await this._box.buildCube(this._scale);
     realMeshes.forEach((m) => {

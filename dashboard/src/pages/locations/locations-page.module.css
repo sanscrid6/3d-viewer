@@ -1,0 +1,21 @@
+.contaner {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    padding: 2rem 4rem;
+}
+
+.addCard {
+    width: 345px;
+    height: 280px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+.icon {
+    height: 30%;
+    width: 30%;
+    cursor: pointer;
+}

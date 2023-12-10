@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+  db:
+    hostname: postgres
+    image: postgres:12-alpine
+    networks:
+      - db_network
+    env_file:
+      - pg.env
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    restart: always
+    ports:
+      - 5432:5432
+  adminer_dev:
+    image: adminer
+    networks:
+      - db_network
+    restart: always
+    ports:
+      - 8080:8080
+networks:
+  db_network:
+    driver: bridge
+    external: false
+    name: db_network
+volumes:
+  postgres:

@@ -8,6 +8,8 @@ import { lerpV3, raycastFromScreen } from '../utils';
 import { Tween } from 'three/examples/jsm/libs/tween.module.js';
 import { moveToFx } from '../state/viewer';
 import { PointerSystem } from './PointerSystem';
+import { asset } from '../api/utils';
+import { $params } from '../state/location';
 
 export class MoveSytem extends BaseSystem {
   private readonly _controls: OrbitControls;
@@ -93,14 +95,16 @@ export class MoveSytem extends BaseSystem {
     this._controls.enabled = false;
 
     const point = this.viewer.locationScene.points[pointIdx];
+    const index = pointIdx;
+    const id = $params.getState().locationId;
 
     await this.viewer.locationScene.viewBox.loadTextures([
-      `LiveOak/cube/${this._currentPoint + 1}_cubefront.jpg`,
-      `LiveOak/cube/${this._currentPoint + 1}_cubeleft.jpg`,
-      `LiveOak/cube/${this._currentPoint + 1}_cuberight.jpg`,
-      `LiveOak/cube/${this._currentPoint + 1}_cubeback.jpg`,
-      `LiveOak/cube/${this._currentPoint + 1}_cubeup.jpg`,
-      `LiveOak/cube/${this._currentPoint + 1}_cubedown.jpg`,
+      asset(`/${id}/cube/${index + 1}_cubefront.jpg`),
+      asset(`/${id}/cube/${index + 1}_cubeleft.jpg`),
+      asset(`/${id}/cube/${index + 1}_cuberight.jpg`),
+      asset(`/${id}/cube/${index + 1}_cubeback.jpg`),
+      asset(`/${id}/cube/${index + 1}_cubeup.jpg`),
+      asset(`/${id}/cube/${index + 1}_cubedown.jpg`),
     ]);
 
     this.viewer.locationScene.viewBox.buildNewCube(this.viewer.scale);
