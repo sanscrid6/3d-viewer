@@ -22,6 +22,9 @@ export class Location {
   @Column({ default: false })
   isPayed: boolean;
 
+  @Column({ default: '' })
+  previewUrl: string;
+
   @ManyToOne(() => User, { onDelete: 'SET NULL' })
   user: User;
 

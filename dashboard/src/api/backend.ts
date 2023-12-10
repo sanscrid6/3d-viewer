@@ -1,5 +1,6 @@
 import {
   CreateLocationRequest,
+  GetLocationStatsResponce,
   LocationResponce,
   LocationsResponce,
   LoginRequest,
@@ -7,6 +8,7 @@ import {
   RegisterRequest,
   RegisterResponce,
   UpdateArchiveRequest,
+  UpdateImageRequest,
   UpdateLocationRequest,
 } from './types';
 import { request } from './utils';
@@ -64,6 +66,24 @@ export function updateArchive(req: UpdateArchiveRequest) {
   return request<LocationResponce>({
     method: 'POST',
     url: `/location/archive/${req.id}`,
+    body: fd,
+  });
+}
+
+export function getLocationStats(locationId: string) {
+  return request<GetLocationStatsResponce>({
+    method: 'GET',
+    url: `/duration-stat/${locationId}`,
+  });
+}
+
+export function updatePreview(req: UpdateImageRequest) {
+  const fd = new FormData();
+  fd.append('image', req.image);
+
+  return request<LocationResponce>({
+    method: 'POST',
+    url: `/location/preview/${req.id}`,
     body: fd,
   });
 }

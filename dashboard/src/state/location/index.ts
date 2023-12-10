@@ -1,11 +1,13 @@
 import { createEffect, createEvent, createStore, sample } from 'effector';
-import { Location } from './types';
+import { Location, LocationStats } from './types';
 import {
   createLocation,
   getLocationById,
+  getLocationStats,
   getLocations,
   updateArchive,
   updateLocationById,
+  updatePreview,
 } from '../../api/backend';
 import { addToast } from '../toast/toast';
 
@@ -24,10 +26,35 @@ export const getCurrentLocationFx = createEffect(getLocationById);
 export const updateLocationFx = createEffect(updateLocationById);
 export const updateArchiveFx = createEffect(updateArchive);
 
+export const getLocationStatsFx = createEffect(getLocationStats);
+export const $locationStats = createStore<LocationStats | null>(null);
+
+export const updatePreviewFx = createEffect(updatePreview);
+
 $currentLocation.on(updateLocation, (state, data) => {
   if (!state) return null;
 
   return { ...state, ...data };
+});
+
+sample({
+  clock: updatePreviewFx.doneData,
+  source: {
+    currentLocation: $currentLocation,
+  },
+  fn: ({ currentLocation }) => currentLocation!.id,
+  target: getCurrentLocationFx,
+});
+
+sample({
+  clock: getCurrentLocationFx.doneData,
+  fn: ({ id }) => id,
+  target: getLocationStatsFx,
+});
+
+sample({
+  clock: getLocationStatsFx.doneData,
+  target: $locationStats,
 });
 
 sample({

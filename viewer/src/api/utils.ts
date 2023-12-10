@@ -1,4 +1,4 @@
-const base = 'http://localhost:8888/api/v1';
+export const base = 'http://localhost:8888/api/v1';
 
 type RequestData = {
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';

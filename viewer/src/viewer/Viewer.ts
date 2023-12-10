@@ -5,8 +5,8 @@ import { LocationScene } from './LocationScene';
 import TWEEN from 'three/examples/jsm/libs/tween.module.js';
 import { BaseSystem, SystemName } from './BaseSystem';
 import { PointerSystem } from './PointerSystem';
-import { asset } from '../api/utils';
-import { $params } from '../state/location';
+import { asset, base } from '../api/utils';
+import { $location, $params } from '../state/location';
 
 export class Viewer {
   private readonly _canvas: HTMLCanvasElement;
@@ -19,6 +19,8 @@ export class Viewer {
   private _locationScene!: LocationScene;
 
   public ready = false;
+
+  public pointEnteredTime = 0;
 
   get scale() {
     return this._scale;
@@ -63,6 +65,19 @@ export class Viewer {
     ];
 
     this.systems.forEach((s) => s.init());
+
+    window.onbeforeunload = () => {
+      navigator.sendBeacon(
+        base + '/duration-stat',
+        new URLSearchParams({
+          locationId: $params.getState()!.locationId!,
+          pointId: (
+            this.getSystem<MoveSytem>(SystemName.Move).currentPoint + 1
+          ).toString(),
+          duration: (performance.now() - this.pointEnteredTime).toString(),
+        }),
+      );
+    };
   }
 
   async init() {
@@ -81,6 +96,7 @@ export class Viewer {
     const move = this.systems.find((s) => s instanceof MoveSytem)! as MoveSytem;
 
     move.setCameraPos(pos);
+    this.pointEnteredTime = performance.now();
   }
 
   getSystem<T extends BaseSystem>(name: SystemName) {

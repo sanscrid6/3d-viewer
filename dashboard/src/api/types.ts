@@ -33,3 +33,13 @@ export type UpdateArchiveRequest = {
   id: string;
   archive: Blob;
 };
+
+export type GetLocationStatsResponce = {
+  unique: number;
+  sumDuration: number;
+};
+
+export type UpdateImageRequest = {
+  id: string;
+  image: Blob;
+};

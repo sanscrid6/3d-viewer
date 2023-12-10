@@ -10,6 +10,7 @@ import { moveToFx } from '../state/viewer';
 import { PointerSystem } from './PointerSystem';
 import { asset } from '../api/utils';
 import { $params } from '../state/location';
+import { reportDurationStats } from '../api/backend';
 
 export class MoveSytem extends BaseSystem {
   private readonly _controls: OrbitControls;
@@ -19,6 +20,10 @@ export class MoveSytem extends BaseSystem {
   private _currentPoint = 0;
   private _inMovement = false;
   private _pointer!: PointerSystem;
+
+  get currentPoint() {
+    return this._currentPoint;
+  }
 
   constructor(viewer: Viewer) {
     super(viewer);
@@ -96,7 +101,7 @@ export class MoveSytem extends BaseSystem {
 
     const point = this.viewer.locationScene.points[pointIdx];
     const index = pointIdx;
-    const id = $params.getState().locationId;
+    const id = $params.getState().locationId!;
 
     await this.viewer.locationScene.viewBox.loadTextures([
       asset(`/${id}/cube/${index + 1}_cubefront.jpg`),
@@ -106,6 +111,14 @@ export class MoveSytem extends BaseSystem {
       asset(`/${id}/cube/${index + 1}_cubeup.jpg`),
       asset(`/${id}/cube/${index + 1}_cubedown.jpg`),
     ]);
+
+    reportDurationStats({
+      pointNumber: pointIdx + 1,
+      locationId: id,
+      duration: performance.now() - this.viewer.pointEnteredTime,
+    });
+
+    this.viewer.pointEnteredTime = performance.now();
 
     this.viewer.locationScene.viewBox.buildNewCube(this.viewer.scale);
 

@@ -1,5 +1,6 @@
 import {
   CreateLocationRequest,
+  DurationStatRequest,
   LocationResponce,
   LocationsResponce,
   LoginRequest,
@@ -65,5 +66,13 @@ export function updateArchive(req: UpdateArchiveRequest) {
     method: 'POST',
     url: `/location/archive/${req.id}`,
     body: fd,
+  });
+}
+
+export function reportDurationStats(req: DurationStatRequest) {
+  return request<LocationResponce>({
+    method: 'POST',
+    url: `/duration-stat`,
+    body: req,
   });
 }

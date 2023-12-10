@@ -19,6 +19,7 @@ import { useEffect } from 'react';
 import { openModal } from '../../state/modal';
 import { ModalType } from '../../state/modal/types';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import { asset } from '../../api/utils';
 
 function LocationsPage() {
   const locations = useUnit($locations);
@@ -43,13 +44,14 @@ function LocationsPage() {
   return (
     <div className={styles.contaner}>
       <Grid container spacing={5}>
-        {locations.map(({ id, name, description }, index) => {
+        {locations.map(({ id, name, description, previewUrl }, index) => {
           return (
             <Grid item xs={4} key={index}>
               <Card sx={{ maxWidth: 345, maxHeight: 280 }}>
                 <CardMedia
                   sx={{ height: 140 }}
-                  image="https://statusneo.com/wp-content/uploads/2023/02/MicrosoftTeams-image551ad57e01403f080a9df51975ac40b6efba82553c323a742b42b1c71c1e45f1.jpg"
+                  // crossOrigin="anonymous"
+                  image={asset('/' + previewUrl)}
                   title="green iguana"
                 />
                 <CardContent>

@@ -4,11 +4,15 @@ import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import styles from './location-page.module.css';
 import {
   $currentLocation,
+  $locationStats,
   updateArchiveFx,
   updateLocation,
   updateLocationFx,
+  updatePreviewFx,
 } from '../../state/location';
 import { useUnit } from 'effector-react';
+import { useRef } from 'react';
+import { asset } from '../../api/utils';
 
 const VisuallyHiddenInput = styled('input')({
   clip: 'rect(0 0 0 0)',
@@ -29,6 +33,8 @@ export function InputFileUpload({
   text: string;
   onClick: (blob: Blob) => void;
 }) {
+  const ref = useRef<HTMLInputElement | null>(null);
+
   return (
     <Button
       component="label"
@@ -38,17 +44,63 @@ export function InputFileUpload({
     >
       {text}
       <VisuallyHiddenInput
+        ref={ref}
         type="file"
         onChange={(e) => {
           onClick(e.target.files!.item(0)!);
+
+          e.target.files = null;
         }}
       />
     </Button>
   );
 }
 
+function Preview({
+  url,
+  handler,
+}: {
+  url?: string;
+  handler: (blob: Blob) => Promise<void>;
+}) {
+  return (
+    <div className={styles.preview}>
+      {url && (
+        <img
+          alt="preview"
+          className={styles.preview}
+          src={asset('/' + url)}
+          crossOrigin="anonymous"
+        />
+      )}
+      {!url && (
+        <div className={styles.buttonContainer}>
+          <InputFileUpload text="Загрузить превью" onClick={handler} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function format(ms: number) {
+  ms /= 1000;
+
+  let h = 0;
+  let m = 0;
+  let s = 0;
+
+  h = Math.floor(ms / 3600);
+  ms -= h * 3600;
+  m = Math.floor(ms / 60);
+  ms -= m * 60;
+  s = Math.floor(ms);
+
+  return `${h} часов ${m} минут ${s} секунд`;
+}
+
 function LocationPage() {
   const location = useUnit($currentLocation);
+  const locationStats = useUnit($locationStats);
 
   async function uploadArchive(blob: Blob) {
     await updateArchiveFx({ id: location!.id, archive: blob });
@@ -56,6 +108,19 @@ function LocationPage() {
 
   async function updateLocationHandler() {
     location && (await updateLocationFx(location));
+  }
+
+  // useEffect(() => {
+  //   async function q() {
+  //     console.log(await getLocationStats(location!.id));
+  //   }
+  //   q();
+  // }, [location]);
+
+  function uploadPreviewHandler() {
+    return async (b: Blob) => {
+      await updatePreviewFx({ id: location!.id, image: b });
+    };
   }
 
   return (
@@ -76,17 +141,11 @@ function LocationPage() {
           />
 
           <Typography variant="subtitle2" className={styles.stats}>
-            <div>Просмотрели: 133</div>
-            <div>Общее Время: 134 часа</div>
+            <div>Просмотрели: {locationStats?.unique}</div>
+            <div>Общее Время: {format(locationStats?.sumDuration ?? 0)}</div>
           </Typography>
         </div>
-        <img
-          className={styles.preview}
-          alt="preview"
-          src={
-            'https://statusneo.com/wp-content/uploads/2023/02/MicrosoftTeams-image551ad57e01403f080a9df51975ac40b6efba82553c323a742b42b1c71c1e45f1.jpg'
-          }
-        />
+        <Preview url={location?.previewUrl} handler={uploadPreviewHandler()} />
       </div>
       <div className={styles.buttons}>
         <Button variant="contained" onClick={updateLocationHandler}>

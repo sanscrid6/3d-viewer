@@ -9,7 +9,7 @@ export class DurationStat {
   @Column()
   timestamp: Date;
 
-  @Column()
+  @Column({ type: 'float' })
   duration: number;
 
   @ManyToOne(() => Point, { onDelete: 'CASCADE' })

@@ -11,7 +11,6 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { LocationModule } from './location/location.module';
 import { PointModule } from './point/point.module';
-import { VisitStatModule } from './visit-stat/visit-stat.module';
 import { DurationStatModule } from './duration-stat/duration-stat.module';
 import { FileService } from './utils/file.service';
 
@@ -47,7 +46,6 @@ import { FileService } from './utils/file.service';
     }),
     LocationModule,
     PointModule,
-    VisitStatModule,
     DurationStatModule,
     UserModule,
     AuthModule,

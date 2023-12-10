@@ -18,6 +18,8 @@ type RefreshTokenResponse = {
   userId: string;
 };
 
+export const asset = (path: string) => 'http://localhost:8888/media' + path;
+
 export async function requestWithCredentials<T>({
   method,
   url,

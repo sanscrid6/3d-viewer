@@ -41,8 +41,6 @@ sample({
 sample({
   clock: [loginFx.doneData, registerFx.doneData],
   fn: ({ userId }) => {
-    console.log(userId);
-
     return {
       id: userId,
     };

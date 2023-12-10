@@ -50,9 +50,18 @@ export class LocationController {
   @UseInterceptors(FileInterceptor('archive'))
   updateArchive(
     @UploadedFile() file: Express.Multer.File,
-    @Param(':id') id: string,
+    @Param('id') id: string,
   ) {
     return this.locationService.updateArchive(id, file);
+  }
+
+  @Post('/preview/:id')
+  @UseInterceptors(FileInterceptor('image'))
+  uploadPreview(
+    @UploadedFile() file: Express.Multer.File,
+    @Param('id') id: string,
+  ) {
+    return this.locationService.uploadPreview(id, file);
   }
 
   // @Delete(':id')

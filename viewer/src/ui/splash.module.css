@@ -3,9 +3,19 @@
     height: 100%;
     display: flex;
     justify-content: center;
-    background-color: black;
     color: white;
     pointer-events: none;
+    margin: 0;
+}
+
+.splash {
+    filter: blur(8px);
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    position: absolute;
+    z-index: -1;
+    padding: 0;
     margin: 0;
 }
 

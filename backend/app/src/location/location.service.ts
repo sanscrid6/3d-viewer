@@ -81,6 +81,7 @@ export class LocationService {
       const location = await this.locationRepository.findOneByOrFail({ id });
       await this.pointRepository.delete({ location });
       await this.fileService.deleteMediaFolder(location.id);
+      await this.locationRepository.update({ id }, { previewUrl: '' });
 
       const zip = new AdmZip(file.buffer);
       const entries = zip.getEntries();
@@ -98,6 +99,7 @@ export class LocationService {
             y: +p.translation[1],
             z: +p.translation[2],
             number: +p.name.slice(6),
+            location,
           }),
         ),
       );
@@ -106,7 +108,6 @@ export class LocationService {
         for (const f of this.filesToWrite) {
           if (e.entryName.match(f.name)) {
             const data = e.getData();
-
             await this.fileService.writeMedia(
               join(location.id, e.entryName),
               data,
@@ -114,6 +115,20 @@ export class LocationService {
           }
         }
       }
+    } catch (error) {
+      throw new CustomException((error as { message: string }).message);
+    }
+  }
+
+  async uploadPreview(id: string, file: Express.Multer.File) {
+    try {
+      const previewUrl = join(
+        id,
+        `preview.${file.originalname.split('.').at(-1)}`,
+      );
+
+      await this.fileService.writeMedia(previewUrl, file.buffer);
+      await this.locationRepository.update({ id }, { previewUrl });
     } catch (error) {
       throw new CustomException((error as { message: string }).message);
     }

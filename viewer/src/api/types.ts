@@ -33,3 +33,9 @@ export type UpdateArchiveRequest = {
   id: string;
   archive: Blob;
 };
+
+export type DurationStatRequest = {
+  locationId: string;
+  pointNumber: number;
+  duration: number;
+};

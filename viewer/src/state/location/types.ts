@@ -9,4 +9,5 @@ export type Location = {
   name: string;
   description: string;
   points: Point[];
+  previewUrl?: string;
 };
