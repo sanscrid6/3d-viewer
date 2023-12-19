@@ -10,6 +10,8 @@ import { CustomException } from 'src/utils/custom-exeption';
 import { Gltf } from './types';
 import { join } from 'path';
 import { PointRepository } from 'src/point/point.repository';
+import config from 'src/config';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
 export class LocationService {
@@ -66,12 +68,23 @@ export class LocationService {
     });
   }
 
-  update(id: string, updateLocationDto: UpdateLocationDto) {
+  async update(
+    id: string,
+    userId: string,
+    updateLocationDto: UpdateLocationDto,
+  ) {
+    const user = await this.userRepository.findOneByOrFail({ id: userId });
+
+    if (updateLocationDto.isPublic && user.balance < config.pricePerDay) {
+      throw new CustomException('Недостаточно средств');
+    }
+
     return this.locationRepository.update(
       { id },
       {
         name: updateLocationDto.name,
         description: updateLocationDto.description,
+        isPublic: Boolean(updateLocationDto.isPublic),
       },
     );
   }
@@ -79,7 +92,11 @@ export class LocationService {
   async updateArchive(id: string, file: Express.Multer.File) {
     try {
       const location = await this.locationRepository.findOneByOrFail({ id });
-      await this.pointRepository.delete({ location });
+      await this.pointRepository.delete({
+        location: {
+          id: location.id,
+        },
+      });
       await this.fileService.deleteMediaFolder(location.id);
       await this.locationRepository.update({ id }, { previewUrl: '' });
 
@@ -134,7 +151,24 @@ export class LocationService {
     }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} location`;
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  async removeMoney() {
+    const locations = await this.locationRepository.find({
+      relations: { user: true },
+    });
+
+    for (const location of locations) {
+      if (!location.isPublic) continue;
+
+      if (location.user.balance >= config.pricePerDay) {
+        await this.userRepository.update(location.user.id, {
+          balance: location.user.balance - config.pricePerDay,
+        });
+      } else {
+        await this.locationRepository.update(location.id, {
+          isPublic: false,
+        });
+      }
+    }
   }
 }

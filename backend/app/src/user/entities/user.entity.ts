@@ -14,4 +14,10 @@ export class User {
 
   @Column()
   salt: string;
+
+  @Column({ type: 'decimal', precision: 100, scale: 2, default: 0 })
+  balance: number;
+
+  @Column('text', { array: true, default: [] })
+  hashes: string[];
 }

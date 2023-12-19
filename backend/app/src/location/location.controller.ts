@@ -42,8 +42,9 @@ export class LocationController {
   update(
     @Param('id') id: string,
     @Body() updateLocationDto: UpdateLocationDto,
+    @User() user: RequestUserInfo,
   ) {
-    return this.locationService.update(id, updateLocationDto);
+    return this.locationService.update(id, user.id, updateLocationDto);
   }
 
   @Post('/archive/:id')

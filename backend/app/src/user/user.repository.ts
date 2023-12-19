@@ -11,4 +11,12 @@ export class UserRepository extends Repository<User> {
   ) {
     super(repository.target, repository.manager, repository.queryRunner);
   }
+
+  async getUsersWithPendingTransactions() {
+    const q = this.createQueryBuilder('user')
+      .select('*')
+      .where('cardinality("user"."hashes") > 0');
+
+    return q.execute() as Promise<User[]>;
+  }
 }

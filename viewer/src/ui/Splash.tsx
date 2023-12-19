@@ -41,9 +41,13 @@ function Splash({ setStart }: SplashProps) {
       )}
       <div className={styles.info}>
         <h1 className={styles.text}>{location?.name}</h1>
-        <button className={styles.button} onClick={startHandler}>
-          Начать тур
-        </button>
+        {location?.isPublic ? (
+          <button className={styles.button} onClick={startHandler}>
+            Начать тур
+          </button>
+        ) : (
+          'Локация не доступна для просмотра'
+        )}
       </div>
     </div>
   );

@@ -19,11 +19,11 @@ export class Location {
   @Column({ default: '' })
   description: string;
 
-  @Column({ default: false })
-  isPayed: boolean;
-
   @Column({ default: '' })
   previewUrl: string;
+
+  @Column({ default: false })
+  isPublic: boolean;
 
   @ManyToOne(() => User, { onDelete: 'SET NULL' })
   user: User;

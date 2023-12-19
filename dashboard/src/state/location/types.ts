@@ -3,6 +3,7 @@ export type Location = {
   name: string;
   description: string;
   previewUrl?: string;
+  isPublic: boolean;
 };
 
 export type LocationStats = {

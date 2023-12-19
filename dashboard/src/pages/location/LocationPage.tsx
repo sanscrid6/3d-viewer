@@ -5,6 +5,7 @@ import styles from './location-page.module.css';
 import {
   $currentLocation,
   $locationStats,
+  getCurrentLocationFx,
   updateArchiveFx,
   updateLocation,
   updateLocationFx,
@@ -110,12 +111,12 @@ function LocationPage() {
     location && (await updateLocationFx(location));
   }
 
-  // useEffect(() => {
-  //   async function q() {
-  //     console.log(await getLocationStats(location!.id));
-  //   }
-  //   q();
-  // }, [location]);
+  async function changePrivacyHandler() {
+    if (location) {
+      await updateLocationFx({ ...location, isPublic: !location.isPublic });
+      await getCurrentLocationFx(location.id);
+    }
+  }
 
   function uploadPreviewHandler() {
     return async (b: Blob) => {
@@ -150,6 +151,9 @@ function LocationPage() {
       <div className={styles.buttons}>
         <Button variant="contained" onClick={updateLocationHandler}>
           Сохранить
+        </Button>
+        <Button variant="contained" onClick={changePrivacyHandler}>
+          {location?.isPublic ? 'Сделать приватной' : 'Сделать публичной'}
         </Button>
         <InputFileUpload text="Зaгрузить архив" onClick={uploadArchive} />
       </div>

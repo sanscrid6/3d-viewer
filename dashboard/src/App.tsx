@@ -6,12 +6,24 @@ import { useHeight } from './hooks/useHeight';
 import { useEffect, useRef } from 'react';
 import { LogInModal } from './layout/modal/LogInModal';
 import { SignInModal } from './layout/modal/SignInModal';
-import { setUser } from './state/user';
+import { getUserFx, setUser } from './state/user';
 import { useNavigate } from 'react-router-dom';
 import { CreateLocationModal } from './layout/modal/CreateLocationModal';
 import Toasts from './components/toasts/Toasts';
+import { WagmiConfig, createConfig } from 'wagmi';
+import { goerli } from 'wagmi/chains';
+import { createPublicClient, http } from 'viem';
+import { PaymentModal } from './layout/modal/PaymentModal';
 
 const theme = createTheme();
+
+const config = createConfig({
+  autoConnect: true,
+  publicClient: createPublicClient({
+    chain: goerli,
+    transport: http(),
+  }),
+});
 
 function App() {
   const ref = useRef<HTMLElement | null>(null);
@@ -21,24 +33,32 @@ function App() {
   useEffect(() => {
     const userId = localStorage.getItem('userId');
     if (userId) {
-      setUser({ id: userId });
+      getUserFx({ id: userId });
+      setInterval(() => {
+        getUserFx({ id: userId });
+      }, 10_000);
       navigate('/locations');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
-    <ThemeProvider theme={theme}>
-      <Header ref={ref} />
-      <LogInModal />
-      <SignInModal />
-      <CreateLocationModal />
-      <Toasts />
+    <WagmiConfig config={config}>
+      <ThemeProvider theme={theme}>
+        <Header ref={ref} />
+        <LogInModal />
+        <SignInModal />
+        <CreateLocationModal />
+        <Toasts />
+        <PaymentModal />
 
-      <div style={{ height: `calc(100% - ${height}px)`, position: 'relative' }}>
-        <Router />
-      </div>
-    </ThemeProvider>
+        <div
+          style={{ height: `calc(100% - ${height}px)`, position: 'relative' }}
+        >
+          <Router />
+        </div>
+      </ThemeProvider>
+    </WagmiConfig>
   );
 }
 

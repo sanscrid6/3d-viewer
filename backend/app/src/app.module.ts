@@ -13,6 +13,7 @@ import { LocationModule } from './location/location.module';
 import { PointModule } from './point/point.module';
 import { DurationStatModule } from './duration-stat/duration-stat.module';
 import { FileService } from './utils/file.service';
+import { PaymentModule } from './payment/payment.module';
 
 @Module({
   providers: [
@@ -49,6 +50,7 @@ import { FileService } from './utils/file.service';
     DurationStatModule,
     UserModule,
     AuthModule,
+    PaymentModule,
   ],
 })
 export class AppModule {}

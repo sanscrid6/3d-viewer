@@ -1,6 +1,8 @@
 import {
   CreateLocationRequest,
   GetLocationStatsResponce,
+  GetUserRequest,
+  GetUserResponse,
   LocationResponce,
   LocationsResponce,
   LoginRequest,
@@ -10,6 +12,7 @@ import {
   UpdateArchiveRequest,
   UpdateImageRequest,
   UpdateLocationRequest,
+  UpdateUserRequest,
 } from './types';
 import { request } from './utils';
 
@@ -74,6 +77,21 @@ export function getLocationStats(locationId: string) {
   return request<GetLocationStatsResponce>({
     method: 'GET',
     url: `/duration-stat/${locationId}`,
+  });
+}
+
+export function updateUser(req: UpdateUserRequest) {
+  return request({
+    method: 'PATCH',
+    url: `/users/${req.id}`,
+    body: req,
+  });
+}
+
+export function getUser(req: GetUserRequest) {
+  return request<GetUserResponse>({
+    method: 'GET',
+    url: `/users/${req.id}`,
   });
 }
 

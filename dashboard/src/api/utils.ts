@@ -68,7 +68,7 @@ export async function requestWithCredentials<T>({
     throw {
       code: res.status,
       statusText: res.statusText,
-      message: (data as { message: string }).message,
+      message: (data as { error: string }).error,
     };
   }
 

@@ -10,4 +10,5 @@ export type Location = {
   description: string;
   points: Point[];
   previewUrl?: string;
+  isPublic: boolean;
 };

@@ -10,4 +10,9 @@ export class CreateLocationDto {
   @IsOptional()
   @ApiProperty()
   description: string;
+
+  @IsString()
+  @IsOptional()
+  @ApiProperty()
+  isPublic: string;
 }

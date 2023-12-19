@@ -22,6 +22,7 @@ export type LocationsResponce = Location[];
 export type CreateLocationRequest = {
   name: string;
   description?: string;
+  isPublic?: boolean;
 };
 
 export type LocationResponce = Location;
@@ -42,4 +43,18 @@ export type GetLocationStatsResponce = {
 export type UpdateImageRequest = {
   id: string;
   image: Blob;
+};
+
+export type UpdateUserRequest = {
+  id: string;
+  hash?: string;
+};
+
+export type GetUserRequest = {
+  id: string;
+};
+
+export type GetUserResponse = {
+  id: string;
+  balance: number;
 };
